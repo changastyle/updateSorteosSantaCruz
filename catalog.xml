@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://crisdian:8080/saaServices/services/smarttv/sorteos" uri="xml-resources/web-service-references/sorteos_1/wsdl/crisdian_8080/saaServices/services/smarttv/sorteos"/>
+</catalog>
