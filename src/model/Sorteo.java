@@ -1,21 +1,21 @@
 package model;
-public class Sorteos
+public class Sorteo
 {
-    private String cSorte;
+    private int cSorte;
     private String cJuego;
     private char fileName;
     private String fSorte;
     private String servj;
 
-    public Sorteos()
+    public Sorteo()
     {
-        this.cSorte = "";
+        this.cSorte = 0;
         this.cJuego = "";;
         this.fileName = 'c';
         this.fSorte = "";;
         this.servj = "";;
     }
-    public Sorteos(String cSorte, String cJuego, char fileName, String fSorte, String servj)
+    public Sorteo(int cSorte, String cJuego, char fileName, String fSorte, String servj)
     {
         this.cSorte = cSorte;
         this.cJuego = cJuego;
@@ -25,12 +25,12 @@ public class Sorteos
     }
     
     //<editor-fold desc="GYS">
-    public String getcSorte()
+    public int getcSorte()
     {
         return cSorte;
     }
 
-    public void setcSorte(String cSorte)
+    public void setcSorte(int cSorte)
     {
         this.cSorte = cSorte;
     }
@@ -79,6 +79,6 @@ public class Sorteos
     @Override
     public String toString()
     {
-        return "Sorteos{" + "cSorte=" + cSorte + ", cJuego=" + cJuego + ", fileName=" + fileName + ", fSorte=" + fSorte + ", servj=" + servj + '}';
+        return "Sorteo{" + "cSorte=" + cSorte + ", cJuego=" + cJuego + ", fileName=" + fileName + ", fSorte=" + fSorte + ", servj=" + servj + '}';
     }
 }

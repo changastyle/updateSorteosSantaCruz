@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 02/09/2015 16:23:16 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="model.Listaip" table="listaip" schema="public" optimistic-lock="version">
+        <composite-id name="id" class="model.ListaipId">
+            <key-property name="instalacionId" type="long">
+                <column name="instalacion_id" />
+            </key-property>
+            <key-property name="ip" type="string">
+                <column name="ip" length="50" />
+            </key-property>
+        </composite-id>
+        <property name="habil" type="boolean">
+            <column name="habil" not-null="true" />
+        </property>
+        <property name="estado" type="char">
+            <column name="estado" length="1" not-null="true" />
+        </property>
+        <property name="descripcion" type="string">
+            <column name="descripcion" />
+        </property>
+    </class>
+</hibernate-mapping>
