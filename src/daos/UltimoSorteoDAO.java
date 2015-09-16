@@ -18,4 +18,27 @@ public class UltimoSorteoDAO
         
         return arrRespuesta;
     }
+    public static boolean saveUltimoSorteo(Ultimosorteo ultimosorteo)
+    {
+        boolean respuesta = false;
+        
+        if(AbstractDAO.save(ultimosorteo) > 0)
+        {
+            respuesta = true;
+        }
+        
+        return respuesta;
+    }
+    public static boolean updateUltimoSorteo(Ultimosorteo ultimosorteo)
+    {
+        boolean respuesta = false;
+        
+        if(AbstractDAO.update(ultimosorteo))
+        {
+            respuesta = true;
+        }
+        
+        return respuesta;
+    }
+
 }

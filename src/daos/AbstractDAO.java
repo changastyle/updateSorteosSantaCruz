@@ -22,10 +22,11 @@ public class AbstractDAO
             Session sessionProvisoria = conectar();
             
             transaction = sessionProvisoria.beginTransaction();
-            id = (int) sessionProvisoria.save(object);
+            /*id = (int)*/ sessionProvisoria.save(object);
             transaction.commit();
            
             desconectar(sessionProvisoria);
+            id = 1;
         }
         catch(Exception e)
         {
@@ -178,7 +179,7 @@ public class AbstractDAO
                 transaction.rollback();
             }
             e.printStackTrace();
-            System.out.println("ERROR: AbstractDAO -> delete: "+ object);
+            System.out.println("ERROR: AbstractDAO -> update: "+ object);
         }
 
         desconectar(sessionProvisoria);

@@ -54,6 +54,12 @@ public class ListaipId  implements java.io.Serializable {
          return result;
    }   
 
+    @Override
+    public String toString()
+    {
+        return "ListaipId{" + "instalacionId=" + instalacionId + ", ip=" + ip + '}';
+    }
+   
 
 }
 

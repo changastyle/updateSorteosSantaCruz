@@ -1,5 +1,8 @@
 package controller;
 
+import Threads.ComandoActualizar;
+import daos.AbstractDAO;
+import daos.UltimoSorteoDAO;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +14,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -116,6 +121,37 @@ public class Controller
         return daos.InstalacionesDAO.findAllInstalaciones();
     }
 
+    public static void pruebas()
+    {
+                        
+        Controller.arrDeInstalaciones = imprimirInstalaciones();
+        Controller.arrDeUltimosSorteos = imprimirSorteosFromDB();
+        Controller.arrSorteosFromWS = imprimirSorteos();
+        
+        for(Sorteo sorteoWS : arrSorteosFromWS)
+        {
+            if( !existeSorteoEnDB(sorteoWS) )
+            {
+                creoSorteo(sorteoWS);
+                if(traerZIP(sorteoWS))
+                {
+                    flagActualizarClientes = true;
+                }
+            }
+            else if( existeSorteoEnDB(sorteoWS) && sorteoEstaDesactualizado(sorteoWS) )
+            {
+                actualizoSorteo(sorteoWS);
+                if(traerZIP(sorteoWS))
+                {
+                    flagActualizarClientes = true;
+                }
+            }
+            else
+            {
+                //ESTA TODO ACTUALIZADO y EXISTEN TODOS LOS JUEGOS.
+            }
+        }
+    }
     public static void hacer()
     {
         flagActualizarClientes = false;
@@ -125,30 +161,29 @@ public class Controller
             try
             {
                 vueltas++;
-                System.out.println("|---------------------------------- Vuelta: " + vueltas +" ----------------------------------|");
-                
                 
                 Controller.arrDeInstalaciones = imprimirInstalaciones();
                 Controller.arrDeUltimosSorteos = imprimirSorteosFromDB();
                 Controller.arrSorteosFromWS = imprimirSorteos();
                 
                 
+               
                 for(Sorteo sorteoWS : arrSorteosFromWS)
                 {
                     if( !existeSorteoEnDB(sorteoWS) )
                     {
-                        creoSorteo(sorteoWS);
                         if(traerZIP(sorteoWS))
                         {
+                            creoSorteo(sorteoWS);
                             flagActualizarClientes = true;
                         }
                     }
                     else if( existeSorteoEnDB(sorteoWS) && sorteoEstaDesactualizado(sorteoWS) )
-                    {
-                        actualizoSorteo(sorteoWS);
+                    { 
                         if(traerZIP(sorteoWS))
                         {
                             flagActualizarClientes = true;
+                            actualizoSorteo(sorteoWS);
                         }
                     }
                     else
@@ -156,11 +191,20 @@ public class Controller
                         //ESTA TODO ACTUALIZADO y EXISTEN TODOS LOS JUEGOS.
                     }
                 }
-                
+                //EN EL CASO DE QUE HALLA QUE ACTUALIZAR, ENTONCES PONGO TODA LA LISTA DE IP COMO DESACTUALIZADA:
+                if(flagActualizarClientes)
+                {
+                    for (Listaip listaip: findAllListaIPS())
+                    {
+                        listaip.setEstado('E');
+                        daos.ListaipsDAO.update(listaip);
+                    }
+                }
                 sincro();
                 
-                
+                System.out.println("|---------------------------------- Vuelta: " + vueltas +" ----------------------------------|");
                 Thread.sleep(tiempoDeLoop);
+                //break;      //Provisorio:
             } 
             catch (Exception e)
             {
@@ -169,7 +213,10 @@ public class Controller
             }
         }
     }
-
+    private static ArrayList<Listaip> findAllListaIPS()
+    {
+        return daos.ListaipsDAO.findAllListaIps();
+    }
     private static ArrayList<Instalaciones> imprimirInstalaciones()
     {
         ArrayList<Instalaciones> arr = controller.Controller.findAllInstalaciones();
@@ -203,6 +250,18 @@ public class Controller
         }
         return arr;
     }
+    public static ArrayList<Listaip> imprimirListaIps()
+    {
+        ArrayList<Listaip> arr = controller.Controller.findAllListaIPS();
+         
+        //System.out.println("INSTALACIONES:");
+        
+        for(model.Listaip listaip : arr)
+        {
+            System.out.println("    " + listaip.toString());
+        }
+        return arr;
+    }
     private static boolean existeSorteoEnDB(Sorteo sorteoWS)
     {
         boolean respuesta = false;
@@ -213,7 +272,7 @@ public class Controller
             {
                 if(sorteoDB.getId().getDName().charAt(0) == sorteoWS.getFileName())
                 {
-                    respuesta =true;
+                    respuesta = true;
                 }
             }
         }
@@ -222,14 +281,36 @@ public class Controller
     }
 
     private static void creoSorteo(Sorteo sorteoWS)
-    {
-        System.out.println("CREO SORTEO: " + sorteoWS.toString());
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    {   
+        Ultimosorteo ultimosorteo = new Ultimosorteo();
+        ultimosorteo.setId(new UltimosorteoId(1, Integer.parseInt(sorteoWS.getcJuego()), String.valueOf(sorteoWS.getFileName()) ));
+        ultimosorteo.setCSorte(sorteoWS.getcSorte());
+        
+        Timestamp stamp = new Timestamp( Long.parseLong(sorteoWS.getfSorte()));
+        Date date = new Date(stamp.getTime());
+        ultimosorteo.setFSorte(date);
+        
+        System.out.println("CREO SORTEO: " + ultimosorteo.toString());
+        UltimoSorteoDAO.saveUltimoSorteo(ultimosorteo);
     }
 
     private static void actualizoSorteo(Sorteo sorteoWS)
     {
-        System.out.println("ACTUALIZO SORTEO: " + sorteoWS.toString());
+        
+        
+        Ultimosorteo ultimosorteo = new Ultimosorteo();
+        ultimosorteo.setId(new UltimosorteoId(1, Integer.parseInt(sorteoWS.getcJuego()), String.valueOf(sorteoWS.getFileName()) ));
+        ultimosorteo.setCSorte(sorteoWS.getcSorte());
+        
+        
+        
+        Timestamp stamp = new Timestamp( Long.parseLong(sorteoWS.getfSorte()));
+        Date date = new Date(stamp.getTime());
+        ultimosorteo.setFSorte(date);        
+        
+        System.out.println("ACTUALIZO SORTEO: " + ultimosorteo.toString());
+        
+        UltimoSorteoDAO.updateUltimoSorteo(ultimosorteo);
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -325,16 +406,25 @@ public class Controller
     }
     private static void sincro()
     {
+        /* A MODO DE PRUEBA; LUEGO QUITAR:*/flagActualizarClientes = true;
+        System.out.println("FLAG ACTUALIZAR CLIENTES: " + flagActualizarClientes);
         if(flagActualizarClientes)
         {
-            /*for(listaIP)
+            System.out.println("ENTRE A SYNCRONIZAR:");
+            for(Listaip ip : controller.Controller.findAllListaIPS())
             {
-                ComandoActualizar comandoActualizar = new ComandoActualizat(ip);
-            
-                comandoActualizar.start();
+                //
+                if(ip.getEstado() == 'E')
+                {
+                                   
+                    System.out.println("" + ip.toString());
 
-            }*/
-            
+                    ComandoActualizar comandoActualizar = new ComandoActualizar(ip);
+
+                    comandoActualizar.start(); 
+                }
+
+            }
         }
     }
 }

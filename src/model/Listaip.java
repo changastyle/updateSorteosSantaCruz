@@ -59,6 +59,13 @@ public class Listaip  implements java.io.Serializable {
         this.descripcion = descripcion;
     }
 
+    @Override
+    public String toString()
+    {
+        return "Listaip{" + "id=" + id + ", habil=" + habil + ", estado=" + estado + ", descripcion=" + descripcion + '}';
+    }
+    
+
 
 
 

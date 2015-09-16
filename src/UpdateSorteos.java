@@ -1,4 +1,4 @@
-package updatesorteos;
+
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,9 +21,11 @@ public class UpdateSorteos
     public static void main(String[] args) throws Exception
     {
         //controller.Controller.imprimirSorteosFromDB();
-       
-        //controller.Controller.hacer();
-        controller.Controller.unzip("carpetitaDeLosSorteos/7658.zip");
+    
+        //controller.Controller.pruebas();
+        
+        controller.Controller.hacer();
+        //controller.Controller.unzip("carpetitaDeLosSorteos/7658.zip");
 
     }
 }
